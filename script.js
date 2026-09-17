@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080/api/presentes";
+const API_URL = "https://casamento-backend-w0y5.onrender.com/api/presentes";
 
 async function buscarPresentes() {
   const container = document.getElementById("grid-presentes");
