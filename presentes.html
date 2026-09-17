@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lista de Presentes | Adiel & Julia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="text-slate-800 antialiased min-h-screen bg-[#f4f9fd]">
+
+  <!-- Topo da Guia -->
+  <header class="py-12 px-4 bg-gradient-to-b from-[#d8ebfa] to-[#f4f9fd] border-b border-white text-center">
+    <a href="index.html" class="inline-block text-xs uppercase tracking-widest text-sky-700 hover:underline mb-4 font-semibold">
+      ← Voltar para a Página Inicial
+    </a>
+    <h1 class="font-script text-6xl md:text-7xl text-slate-800">Lista de Presentes Virtuais</h1>
+    <p class="font-serif text-[#c5a059] tracking-widest text-lg mt-2">Adiel & Julia • 14.11.2026</p>
+    <p class="text-slate-500 text-sm max-w-lg mx-auto mt-3 font-light leading-relaxed">
+      Escolha qualquer mimo abaixo para nos ajudar na nossa lua de mel e na montagem da casa nova. Pagamento seguro via <strong>Pix ou Cartão</strong>.
+    </p>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-12">
+    <!-- Grid Dinâmico -->
+    <div id="grid-presentes" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="col-span-full text-center py-12">
+        <p class="text-slate-400 animate-pulse">Carregando os presentes...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="text-center py-8 border-t border-sky-100 text-slate-400 text-xs">
+    <p>Adiel & Julia • 14.11.2026</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    // Carrega apenas os presentes disponíveis
+    buscarPresentes();
+  </script>
+</body>
+</html>
