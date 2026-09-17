@@ -13,20 +13,52 @@
 <body class="text-slate-800 antialiased min-h-screen">
 
   <!-- HERO / TOPO DO CONVITE -->
-  <header class="relative text-center py-20 px-4 bg-gradient-to-b from-[#d8ebfa] via-[#eaf4fc] to-[#f4f9fd] border-b border-white">
-    <div class="max-w-2xl mx-auto space-y-4">
-      <p class="italic text-slate-500 text-lg md:text-xl font-serif">"Onde há amor, há bênçãos e felicidade."</p>
-      <p class="text-xs uppercase tracking-[0.3em] text-slate-400 font-medium">Juntamente com suas famílias</p>
+  <!-- ================= HERO SECTION (TELA CHEIA) ================= -->
+  <header class="relative w-full h-screen flex flex-col justify-between items-center text-center px-4 py-12 text-white overflow-hidden">
+    
+    <!-- Imagem de fundo garantida -->
+    <img src="casal.png" 
+         alt="Foto do Casal" 
+         class="absolute inset-0 w-full h-full object-cover object-center z-0 pointer-events-none" />
+
+    <!-- Camada escura para dar leitura aos textos -->
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-900/50 to-slate-950/80 z-10"></div>
+
+    <!-- Topo -->
+    <div class="relative z-20 pt-6">
+      <p class="text-xs uppercase tracking-[0.35em] text-white/80 font-light drop-shadow">
+        Juntamente com suas famílias convidam
+      </p>
+    </div>
+
+    <!-- Centro: Nomes dos noivos e data -->
+    <div class="relative z-20 space-y-4 max-w-3xl">
+      <p class="font-serif italic text-white/90 text-lg md:text-2xl drop-shadow">
+        "Onde há amor, há bênçãos e felicidade."
+      </p>
       
-      <h1 class="font-script text-7xl md:text-9xl text-slate-800 py-2">Adiel & Julia</h1>
-      
-      <p class="text-lg text-slate-600 font-light">Convidam com imensa alegria para o seu casamento</p>
-      
-      <!-- Moldura da Data -->
-      <div class="inline-block mt-4 border-y border-[#c5a059]/40 py-3 px-10">
-        <p class="font-serif text-3xl md:text-4xl text-[#c5a059] tracking-widest font-semibold">14 . 11 . 2026</p>
-        <p class="text-sm text-slate-500 uppercase tracking-widest mt-1">Sábado, às 15h30</p>
+      <h1 class="font-script text-7xl sm:text-8xl md:text-9xl text-white py-2 drop-shadow-lg tracking-wide">
+        Adiel & Julia
+      </h1>
+
+      <div class="inline-block border-y border-white/40 py-3 px-10 backdrop-blur-[2px]">
+        <p class="font-serif text-2xl md:text-4xl text-[#f3e3bc] tracking-[0.2em] font-semibold drop-shadow">
+          14 . 11 . 2026
+        </p>
+        <p class="text-xs md:text-sm uppercase tracking-widest text-white/90 mt-1 font-light">
+          Sábado • às 15h30
+        </p>
       </div>
+    </div>
+
+    <!-- Rodapé da Hero: Setinha para rolar a página -->
+    <div class="relative z-20 pb-4 flex flex-col items-center gap-2">
+      <a href="#conteudo" class="group flex flex-col items-center text-white/70 hover:text-white transition">
+        <span class="text-[11px] uppercase tracking-widest mb-1 font-medium group-hover:tracking-[0.2em] transition-all">Role para explorar</span>
+        <svg class="w-6 h-6 animate-bounce-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
+      </a>
     </div>
   </header>
 
