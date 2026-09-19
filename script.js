@@ -67,6 +67,98 @@ async function buscarPresentes() {
   }
 }
 
+function baixarICS() {
+  const icsContent = 
+`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Casamento Adiel e Julia//PT
+BEGIN:VEVENT
+UID:casamento-adiel-julia-2026@casamento.com
+DTSTAMP:20260919T120000Z
+DTSTART:20261114T183000Z
+DTEND:20261115T020000Z
+SUMMARY:Casamento Adiel & Julia
+DESCRIPTION:Celebração do Casamento de Adiel e Julia.
+LOCATION:Local do Casamento
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR`;
+
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = window.URL.createObjectURL(blob);
+  link.setAttribute('download', 'casamento-adiel-e-julia.ics');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+const MENSAGENS_API = "https://casamento-backend-w0y5.onrender.com/api/mensagens";
+
+async function carregarRecados() {
+  const container = document.getElementById("listaRecados");
+  if (!container) return;
+
+  try {
+    const res = await fetch(MENSAGENS_API);
+    const dados = await res.json();
+
+    if (dados.length === 0) {
+      container.innerHTML = `<div class="col-span-full text-center py-6 text-slate-400 text-sm">Seja o primeiro a deixar uma mensagem de carinho!</div>`;
+      return;
+    }
+
+    container.innerHTML = dados.map(item => `
+      <div class="bg-white p-5 rounded-xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
+        <p class="font-serif italic text-slate-700 text-sm mb-4">"${item.texto}"</p>
+        <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-xs text-slate-400">
+          <span class="font-semibold text-slate-800 font-sans">${item.autor}</span>
+          <span>${item.dataEnvio ? new Date(item.dataEnvio).toLocaleDateString('pt-BR') : ''}</span>
+        </div>
+      </div>
+    `).join("");
+  } catch (error) {
+    container.innerHTML = `<div class="col-span-full text-center py-4 text-rose-500 text-sm">Não foi possível carregar as mensagens.</div>`;
+  }
+}
+
+async function enviarRecado(e) {
+  e.preventDefault();
+  const btn = document.getElementById("btnEnviarRecado");
+  const autorInput = document.getElementById("recadoAutor");
+  const textoInput = document.getElementById("recadoTexto");
+
+  btn.disabled = true;
+  btn.textContent = "Enviando...";
+
+  try {
+    const resposta = await fetch(MENSAGENS_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        autor: autorInput.value,
+        texto: textoInput.value
+      })
+    });
+
+    if (!resposta.ok) throw new Error("Erro ao salvar mensagem");
+
+    autorInput.value = "";
+    textoInput.value = "";
+    await carregarRecados();
+  } catch (err) {
+    alert("Erro ao enviar mensagem. Tente novamente!");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Publicar Mensagem";
+  }
+}
+
+// Inicia a busca das mensagens ao abrir a página
+document.addEventListener("DOMContentLoaded", () => {
+  carregarRecados();
+});
+
 async function iniciarPagamento(id) {
   try {
     const res = await fetch(`${API_URL}/${id}/checkout`, { method: "POST" });
