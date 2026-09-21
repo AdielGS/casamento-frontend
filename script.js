@@ -3,7 +3,8 @@ const API_URL = "https://casamento-backend-w0y5.onrender.com/api/presentes";
 const MENSAGENS_API = "https://casamento-backend-w0y5.onrender.com/api/mensagens";
 
 // SUA PUBLIC KEY DO MERCADO PAGO
-const MP_PUBLIC_KEY = "APP_USR-6bb8e208-f508-4c4f-b06b-5878bd388949"; 
+const MP_PUBLIC_KEY = "APP_USR-c338b80c-ba09-40ba-948d-32126f0d1620"; 
+
 
 let mpInstance = null;
 let bricksBuilder = null;
