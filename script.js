@@ -2,23 +2,37 @@
 const API_URL = "https://casamento-backend-w0y5.onrender.com/api/presentes";
 const MENSAGENS_API = "https://casamento-backend-w0y5.onrender.com/api/mensagens";
 
-// Variável para guardar o ID do presente selecionado no modal
-let presenteSelecionadoId = null;
+// SUA PUBLIC KEY DO MERCADO PAGO
+const MP_PUBLIC_KEY = "APP_USR-6bb8e208-f508-4c4f-b06b-5878bd388949"; 
 
-// Inicializa quando o documento estiver pronto
+let mpInstance = null;
+let bricksBuilder = null;
+let paymentBrickController = null;
+
+let presenteSelecionado = null;
+
+// Função para inicializar o SDK com segurança
+function inicializarMercadoPago() {
+  if (window.MercadoPago && !mpInstance) {
+    mpInstance = new MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
+    bricksBuilder = mpInstance.bricks();
+  }
+}
+
+// Inicializa listas
 document.addEventListener("DOMContentLoaded", () => {
+  inicializarMercadoPago();
   carregarPresentes();
   carregarRecados();
 });
 
 /* ==========================================================
-   1. LÓGICA DA LISTA DE PRESENTES (presentes.html)
+   1. LISTA DE PRESENTES
    ========================================================== */
 
-// Busca os presentes no backend
 async function carregarPresentes() {
   const container = document.getElementById("grid-presentes");
-  if (!container) return; // Se não estiver na página de presentes, ignora
+  if (!container) return;
 
   try {
     const response = await fetch(API_URL);
@@ -36,7 +50,6 @@ async function carregarPresentes() {
   }
 }
 
-// Renderiza os cartões dos presentes
 function renderizarPresentes(presentes) {
   const container = document.getElementById("grid-presentes");
   if (!container) return;
@@ -45,7 +58,7 @@ function renderizarPresentes(presentes) {
   if (presentes.length === 0) {
     container.innerHTML = `
       <div class="col-span-full text-center py-12 text-slate-500">
-        <p class="font-serif italic text-lg">A lista de presentes está a ser montada pelos noivos.</p>
+        <p class="font-serif italic text-lg">A lista de presentes está sendo montada pelos noivos.</p>
       </div>
     `;
     return;
@@ -84,7 +97,7 @@ function renderizarPresentes(presentes) {
           <span class="font-serif text-xl font-semibold text-[#23496d]">${valorFormatado}</span>
           ${
             isDisponivel
-              ? `<button onclick="abrirModalPresentear(${p.id}, '${p.nome}',${p.valor})" 
+              ? `<button onclick="abrirCheckoutBrick(${p.id}, '${p.nome.replace(/'/g, "\\'")}', ${p.valor})" 
                          style="background-color: #23496d !important; color: #ffffff !important; border: 1px solid #23496d !important;" 
                          class="w-full py-2.5 rounded-xl font-sans text-xs uppercase tracking-widest font-semibold flex items-center justify-center gap-2 shadow-sm transition hover:opacity-90 active:scale-[0.99] cursor-pointer">
                    Presentear
@@ -104,82 +117,157 @@ function renderizarPresentes(presentes) {
   });
 }
 
-// Abre o modal de identificação
-function abrirModalPresentear(id, nome, valor) {
-  presenteSelecionadoId = id;
-  
+/* ==========================================================
+   2. CHECKOUT BRICKS (PIX, CARTÃO, BOLETO)
+   ========================================================== */
+
+async function abrirCheckoutBrick(id, nome, valor) {
+  inicializarMercadoPago();
+
+  presenteSelecionado = { id, nome, valor };
+
   const modal = document.getElementById("modalPresentear");
-  const modalNome = document.getElementById("modalNomePresente");
-  const modalValor = document.getElementById("modalValorPresente");
-  const inputNome = document.getElementById("modalInputNome");
-
-  if (!modal) return;
-
-  modalNome.textContent = nome;
-  modalValor.textContent = Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  inputNome.value = "";
+  document.getElementById("modalNomePresente").textContent = nome;
+  document.getElementById("modalValorPresente").textContent = Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  document.getElementById("modalInputNome").value = "";
   
+  // Reseta visualizações
+  document.getElementById("step-nome").classList.remove("hidden");
+  document.getElementById("container-brick").classList.remove("hidden");
+  document.getElementById("resultado-pix").classList.add("hidden");
+  document.getElementById("paymentBrick_container").innerHTML = `
+    <div class="py-10 text-center text-xs text-slate-400">
+      Carregando formas de pagamento...
+    </div>
+  `;
+
   modal.classList.remove("hidden");
-  setTimeout(() => inputNome.focus(), 100);
-}
 
-// Fecha o modal de identificação
-function fecharModalPresentear() {
-  const modal = document.getElementById("modalPresentear");
-  if (modal) modal.classList.add("hidden");
-  presenteSelecionadoId = null;
-}
+  // Destrói brick anterior se existir
+  if (paymentBrickController) {
+    try {
+      paymentBrickController.unmount();
+    } catch(e) {}
+  }
 
-// Envia o nome e redireciona ao checkout do Mercado Pago
-async function confirmarPresentear(e) {
-  e.preventDefault();
-  
-  const inputNome = document.getElementById("modalInputNome");
-  const btnConfirmar = document.getElementById("btnModalConfirmar");
-  const nomeComprador = inputNome.value.trim();
-
-  if (!nomeComprador) {
-    alert("Por favor, digite o seu nome.");
+  if (!bricksBuilder) {
+    document.getElementById("paymentBrick_container").innerHTML = `
+      <div class="p-4 text-center text-xs text-rose-600 bg-rose-50 rounded-xl">
+        Não foi possível carregar o Mercado Pago. Verifique sua conexão ou recarregue a página.
+      </div>
+    `;
     return;
   }
 
-  btnConfirmar.disabled = true;
-  btnConfirmar.innerText = "A carregar Checkout...";
+  // Renderiza o Brick com Pix, Cartão e Boleto
+  const settings = {
+    initialization: {
+      amount: Number(valor),
+    },
+    customization: {
+      paymentMethods: {
+        bankTransfer: 'all',     // Pix
+        creditCard: 'all',       // Cartão de Crédito
+        ticket: 'all',           // Boleto
+      },
+      visual: {
+        style: {
+          theme: 'bootstrap',
+        }
+      }
+    },
+    callbacks: {
+      onReady: () => {
+        // Brick carregado com sucesso
+      },
+      onSubmit: ({ selectedPaymentMethod, formData }) => {
+        return new Promise((resolve, reject) => {
+          const nomeComprador = document.getElementById("modalInputNome").value.trim();
 
-  try {
-    const response = await fetch(`${API_URL}/${presenteSelecionadoId}/checkout`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome: nomeComprador }),
-    });
+          const dadosEnvio = {
+            ...formData,
+            presenteId: presenteSelecionado.id,
+            compradorNome: nomeComprador || "Convidado",
+          };
 
-    const data = await response.json();
-    const linkPagamento = data.initPoint || data.init_point;
+          fetch(`${API_URL}/processar-pagamento`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dadosEnvio),
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === "approved") {
+              alert("Pagamento aprovado com sucesso! Muito obrigado pelo carinho!");
+              fecharModalPresentear();
+              carregarPresentes();
+              resolve();
+            } else if (data.qr_code_base64 || data.qr_code) {
+              // É PIX: Exibe o QR Code na tela
+              document.getElementById("step-nome").classList.add("hidden");
+              document.getElementById("container-brick").classList.add("hidden");
+              
+              const imgQr = document.getElementById("pix-qr-img");
+              imgQr.src = `data:image/png;base64,${data.qr_code_base64}`;
+              document.getElementById("pix-copia-cola").value = data.qr_code;
+              
+              document.getElementById("resultado-pix").classList.remove("hidden");
+              resolve();
+            } else if (data.ticket_url) {
+              // É Boleto
+              window.open(data.ticket_url, '_blank');
+              alert("Boleto gerado com sucesso! Abrimos em uma nova aba para você pagar.");
+              fecharModalPresentear();
+              resolve();
+            } else {
+              alert("Status do pagamento: " + (data.status || "Pendente"));
+              resolve();
+            }
+          })
+          .catch(err => {
+            console.error("Erro ao processar:", err);
+            alert("Erro ao processar pagamento. Verifique os dados e tente novamente.");
+            reject();
+          });
+        });
+      },
+      onError: (error) => {
+        console.error("Erro no Brick:", error);
+      },
+    },
+  };
 
-    if (response.ok && linkPagamento) {
-      window.location.href = linkPagamento;
-    } else {
-      console.error("Detalhes do erro do servidor:", data);
-      alert(data.error || "Não foi possível gerar o link de pagamento. Tente novamente.");
-      btnConfirmar.disabled = false;
-      btnConfirmar.innerText = "Ir para o Pix / Cartão";
-    }
-  } catch (error) {
-    console.error("Erro ao comprar presente:", error);
-    alert("O servidor pode estar a inicializar. Aguarde alguns segundos e tente novamente.");
-    btnConfirmar.disabled = false;
-    btnConfirmar.innerText = "Ir para o Pix / Cartão";
+  paymentBrickController = await bricksBuilder.create(
+    'payment',
+    'paymentBrick_container',
+    settings
+  );
+}
+
+function fecharModalPresentear() {
+  const modal = document.getElementById("modalPresentear");
+  if (modal) modal.classList.add("hidden");
+  if (paymentBrickController) {
+    try { paymentBrickController.unmount(); } catch(e) {}
   }
 }
 
+function copiarPix() {
+  const input = document.getElementById("pix-copia-cola");
+  input.select();
+  navigator.clipboard.writeText(input.value);
+  const btn = document.getElementById("btn-copiar-pix");
+  btn.innerText = "Chave Copiada!";
+  setTimeout(() => { btn.innerText = "Copiar Código Pix"; }, 2000);
+}
+
 /* ==========================================================
-   2. LÓGICA DO MURAL DE RECADOS (index.html)
+   3. MURAL DE RECADOS
    ========================================================== */
 
-// Carrega os recados guardados no Supabase
 async function carregarRecados() {
   const container = document.getElementById("listaRecados");
-  if (!container) return; // Se não estiver na página com o mural, ignora
+  if (!container) return;
 
   try {
     const res = await fetch(MENSAGENS_API);
@@ -206,18 +294,12 @@ async function carregarRecados() {
     `).join("");
   } catch (error) {
     console.error("Erro ao carregar recados:", error);
-    container.innerHTML = `
-      <div class="col-span-full text-center py-4 text-slate-400 text-sm font-light">
-        Não foi possível carregar os recados no momento.
-      </div>
-    `;
+    container.innerHTML = `<div class="col-span-full text-center py-4 text-slate-400 text-sm font-light">Não foi possível carregar os recados.</div>`;
   }
 }
 
-// Envia uma nova mensagem escrita no mural
 async function enviarRecado(e) {
   e.preventDefault();
-  
   const btn = document.getElementById("btnEnviarRecado");
   const autorInput = document.getElementById("recadoAutor");
   const textoInput = document.getElementById("recadoTexto");
@@ -244,10 +326,10 @@ async function enviarRecado(e) {
 
     autorInput.value = "";
     textoInput.value = "";
-    await carregarRecados(); // Atualiza a lista no ecrã imediatamente
+    await carregarRecados();
   } catch (err) {
     console.error("Erro ao enviar mensagem:", err);
-    alert("Erro ao publicar a mensagem. Tente novamente!");
+    alert("Erro ao publicar mensagem.");
   } finally {
     btn.disabled = false;
     btn.innerText = "Publicar Mensagem";
