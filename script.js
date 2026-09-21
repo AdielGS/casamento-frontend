@@ -1,18 +1,24 @@
-// URL base da API
+// URLs das APIs no Render
 const API_URL = "https://casamento-backend-w0y5.onrender.com/api/presentes";
+const MENSAGENS_API = "https://casamento-backend-w0y5.onrender.com/api/mensagens";
 
-// Variável para guardar o ID do presente no modal
+// Variável para guardar o ID do presente selecionado no modal
 let presenteSelecionadoId = null;
 
-// Inicializa na página presentes.html
+// Inicializa quando o documento estiver pronto
 document.addEventListener("DOMContentLoaded", () => {
   carregarPresentes();
+  carregarRecados();
 });
+
+/* ==========================================================
+   1. LÓGICA DA LISTA DE PRESENTES (presentes.html)
+   ========================================================== */
 
 // Busca os presentes no backend
 async function carregarPresentes() {
   const container = document.getElementById("grid-presentes");
-  if (!container) return;
+  if (!container) return; // Se não estiver na página de presentes, ignora
 
   try {
     const response = await fetch(API_URL);
@@ -30,9 +36,10 @@ async function carregarPresentes() {
   }
 }
 
-// Renderiza os cartões dos presentes com a paleta Floral Azul
+// Renderiza os cartões dos presentes
 function renderizarPresentes(presentes) {
   const container = document.getElementById("grid-presentes");
+  if (!container) return;
   container.innerHTML = "";
 
   if (presentes.length === 0) {
@@ -106,6 +113,8 @@ function abrirModalPresentear(id, nome, valor) {
   const modalValor = document.getElementById("modalValorPresente");
   const inputNome = document.getElementById("modalInputNome");
 
+  if (!modal) return;
+
   modalNome.textContent = nome;
   modalValor.textContent = Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   inputNome.value = "";
@@ -114,10 +123,10 @@ function abrirModalPresentear(id, nome, valor) {
   setTimeout(() => inputNome.focus(), 100);
 }
 
-// Fecha o modal
+// Fecha o modal de identificação
 function fecharModalPresentear() {
   const modal = document.getElementById("modalPresentear");
-  modal.classList.add("hidden");
+  if (modal) modal.classList.add("hidden");
   presenteSelecionadoId = null;
 }
 
@@ -138,7 +147,6 @@ async function confirmarPresentear(e) {
   btnConfirmar.innerText = "A carregar Checkout...";
 
   try {
-    // Aponta exatamente para o endpoint /{id}/checkout do PresenteController
     const response = await fetch(`${API_URL}/${presenteSelecionadoId}/checkout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -158,8 +166,90 @@ async function confirmarPresentear(e) {
     }
   } catch (error) {
     console.error("Erro ao comprar presente:", error);
-    alert("O servidor pode estar a inicializar (hibernação do Render). Aguarde alguns segundos e tente novamente.");
+    alert("O servidor pode estar a inicializar. Aguarde alguns segundos e tente novamente.");
     btnConfirmar.disabled = false;
     btnConfirmar.innerText = "Ir para o Pix / Cartão";
+  }
+}
+
+/* ==========================================================
+   2. LÓGICA DO MURAL DE RECADOS (index.html)
+   ========================================================== */
+
+// Carrega os recados guardados no Supabase
+async function carregarRecados() {
+  const container = document.getElementById("listaRecados");
+  if (!container) return; // Se não estiver na página com o mural, ignora
+
+  try {
+    const res = await fetch(MENSAGENS_API);
+    if (!res.ok) throw new Error("Erro ao carregar mensagens");
+    const mensagens = await res.json();
+
+    if (!Array.isArray(mensagens) || mensagens.length === 0) {
+      container.innerHTML = `
+        <div class="col-span-full text-center py-8 text-slate-400 text-sm font-light">
+          Seja o primeiro a deixar uma mensagem de carinho para os noivos!
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = mensagens.map((m) => `
+      <div class="bg-white p-5 rounded-2xl border border-[#cbe4fa] shadow-sm flex flex-col justify-between">
+        <p class="font-serif italic text-slate-700 text-sm leading-relaxed mb-4">"${m.texto}"</p>
+        <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-xs text-slate-400">
+          <span class="font-semibold text-[#1c3852] font-sans">${m.autor}</span>
+          <span>${m.dataEnvio ? new Date(m.dataEnvio).toLocaleDateString('pt-BR') : ''}</span>
+        </div>
+      </div>
+    `).join("");
+  } catch (error) {
+    console.error("Erro ao carregar recados:", error);
+    container.innerHTML = `
+      <div class="col-span-full text-center py-4 text-slate-400 text-sm font-light">
+        Não foi possível carregar os recados no momento.
+      </div>
+    `;
+  }
+}
+
+// Envia uma nova mensagem escrita no mural
+async function enviarRecado(e) {
+  e.preventDefault();
+  
+  const btn = document.getElementById("btnEnviarRecado");
+  const autorInput = document.getElementById("recadoAutor");
+  const textoInput = document.getElementById("recadoTexto");
+
+  const autor = autorInput.value.trim();
+  const texto = textoInput.value.trim();
+
+  if (!autor || !texto) {
+    alert("Por favor, preencha o seu nome e a mensagem.");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = "A publicar...";
+
+  try {
+    const res = await fetch(MENSAGENS_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ autor, texto }),
+    });
+
+    if (!res.ok) throw new Error("Erro ao guardar mensagem");
+
+    autorInput.value = "";
+    textoInput.value = "";
+    await carregarRecados(); // Atualiza a lista no ecrã imediatamente
+  } catch (err) {
+    console.error("Erro ao enviar mensagem:", err);
+    alert("Erro ao publicar a mensagem. Tente novamente!");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "Publicar Mensagem";
   }
 }
