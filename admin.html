@@ -4,130 +4,159 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel dos Noivos | Adiel & Julia</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-[#eef5fa] text-slate-800 min-h-screen p-6">
+<body class="bg-[#f4f8fc] text-slate-800 antialiased min-h-screen p-4 sm:p-6 md:p-8">
 
-  <!-- Tela de Login Inicial -->
-  <div id="tela-login" class="max-w-md mx-auto mt-20 bg-white p-8 rounded-3xl shadow-sm border border-sky-100 text-center">
-    <h2 class="font-serif text-2xl text-[#c5a059] font-bold mb-2">Acesso dos Noivos</h2>
-    <p class="text-sm text-slate-500 mb-6">Digite a senha para gerenciar a lista de presentes</p>
+  <!-- ================= TELA DE LOGIN INICIAL ================= -->
+  <div id="tela-login" class="max-w-md mx-auto my-12 sm:my-20 bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-[#cbe4fa] text-center">
+    <span class="text-[11px] uppercase tracking-[0.25em] text-[#4f7f9e] font-semibold">Área Administrativa</span>
+    <h2 class="font-serif text-2xl sm:text-3xl text-[#1c3852] font-semibold mt-2 mb-2">Acesso dos Noivos</h2>
+    <p class="text-xs sm:text-sm text-slate-500 mb-6 font-light">Digite a senha para gerir a lista de presentes</p>
+    
     <input type="password" id="senha-admin" placeholder="Senha de acesso" 
-           class="w-full p-3 border border-sky-200 rounded-xl mb-4 text-center focus:outline-none focus:ring-2 focus:ring-sky-400" />
+           class="w-full p-3.5 border border-[#cbe4fa] bg-[#f8fbfe] rounded-xl mb-4 text-center focus:outline-none focus:ring-2 focus:ring-[#8bbbe0] text-sm transition" />
+    
     <button onclick="autenticar()" 
-            class="w-full bg-[#009ee3] hover:bg-[#0082ba] text-white py-3 rounded-xl font-medium transition shadow-sm">
+            style="background-color: #23496d !important; color: #ffffff !important;"
+            class="w-full py-3.5 rounded-xl text-xs uppercase tracking-wider font-semibold shadow-md hover:opacity-90 transition active:scale-95 cursor-pointer">
       Entrar no Painel
     </button>
   </div>
 
-  <!-- Painel Principal -->
-  <div id="painel-principal" class="hidden max-w-5xl mx-auto space-y-10">
+  <!-- ================= PAINEL PRINCIPAL ================= -->
+  <div id="painel-principal" class="hidden max-w-5xl mx-auto space-y-8 sm:space-y-10">
     
-    <div class="flex justify-between items-center border-b border-sky-200 pb-4">
+    <!-- Topo / Cabeçalho -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#cbe4fa] pb-5">
       <div>
-        <h1 class="font-serif text-3xl text-slate-800 font-bold">Painel de Presentes</h1>
-        <p class="text-sm text-slate-500">Adicione, edite ou acompanhe as compras dos convidados</p>
+        <h1 class="font-serif text-2xl sm:text-3xl text-[#1c3852] font-semibold">Painel de Presentes</h1>
+        <p class="text-xs sm:text-sm text-slate-500 font-light mt-1">Adicione, edite ou acompanhe as ofertas dos convidados</p>
       </div>
-      <a href="presentes.html" target="_blank" class="text-xs uppercase tracking-wider font-semibold text-sky-600 bg-white border border-sky-200 px-4 py-2 rounded-xl hover:bg-sky-50 transition">
+      <a href="presentes.html" target="_blank" 
+         class="self-start sm:self-auto text-xs uppercase tracking-wider font-semibold text-[#23496d] bg-white border border-[#cbe4fa] px-4 py-2.5 rounded-xl hover:bg-[#eef5fa] transition shadow-sm">
         Ver lista no ar ↗
       </a>
     </div>
 
     <!-- Formulário de Cadastro -->
-    <div class="bg-white p-8 rounded-3xl shadow-sm border border-sky-100">
-      <h3 class="font-serif text-xl text-[#c5a059] font-semibold mb-6">Cadastrar Novo Presente</h3>
+    <div class="bg-white p-5 sm:p-8 rounded-3xl shadow-sm border border-[#cbe4fa]">
+      <h3 class="font-serif text-xl text-[#1c3852] font-medium mb-6">Cadastrar Novo Presente</h3>
       
-      <form id="form-novo-presente" onsubmit="salvarPresente(event)" class="grid md:grid-cols-2 gap-6">
+      <form id="form-novo-presente" onsubmit="salvarPresente(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome do Presente</label>
-          <input type="text" id="cad-nome" placeholder="Ex: Jantar Japonês na Lua de Mel" required 
-                 class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-400 focus:outline-none" />
+          <label class="block text-xs font-semibold text-[#1c3852] uppercase mb-1">Nome do Presente</label>
+          <input type="text" id="cad-nome" placeholder="Ex: Jantar na Lua de Mel" required 
+                 class="w-full p-3 border border-[#cbe4fa] bg-[#f8fbfe] rounded-xl focus:ring-2 focus:ring-[#8bbbe0] focus:outline-none text-sm transition" />
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Valor (R$)</label>
+          <label class="block text-xs font-semibold text-[#1c3852] uppercase mb-1">Valor (R$)</label>
           <input type="number" step="0.01" id="cad-valor" placeholder="Ex: 150.00" required 
-                 class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-400 focus:outline-none" />
+                 class="w-full p-3 border border-[#cbe4fa] bg-[#f8fbfe] rounded-xl focus:ring-2 focus:ring-[#8bbbe0] focus:outline-none text-sm transition" />
         </div>
 
         <div class="md:col-span-2">
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Descrição</label>
-          <input type="text" id="cad-descricao" placeholder="Ex: Para curtirmos um momento romântico a dois" 
-                 class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-400 focus:outline-none" />
+          <label class="block text-xs font-semibold text-[#1c3852] uppercase mb-1">Descrição</label>
+          <input type="text" id="cad-descricao" placeholder="Ex: Para celebrarmos um momento romântico a dois" 
+                 class="w-full p-3 border border-[#cbe4fa] bg-[#f8fbfe] rounded-xl focus:ring-2 focus:ring-[#8bbbe0] focus:outline-none text-sm transition" />
         </div>
 
-        <!-- Upload com Preview -->
+        <!-- Upload Responsivo com Preview -->
         <div class="md:col-span-2">
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Foto do Presente</label>
-          <div class="flex items-center gap-6 p-4 border-2 border-dashed border-sky-200 rounded-2xl bg-sky-50/50">
-            <div class="w-20 h-20 rounded-xl bg-white border border-slate-200 overflow-hidden shrink-0">
+          <label class="block text-xs font-semibold text-[#1c3852] uppercase mb-2">Foto do Presente</label>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 p-4 border-2 border-dashed border-[#cbe4fa] rounded-2xl bg-[#f8fbfe]">
+            <div class="w-20 h-20 rounded-xl bg-white border border-slate-200 overflow-hidden shrink-0 shadow-sm">
               <img id="img-preview" src="https://images.unsplash.com/photo-1513151233558-d860c5398176?w=200&q=80" 
                    alt="Preview" class="w-full h-full object-cover">
             </div>
-            <div>
+            <div class="w-full overflow-hidden">
               <input type="file" id="cad-arquivo-foto" accept="image/*" onchange="processarFoto(event, 'preview-novo')" 
-                     class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200 cursor-pointer" />
+                     class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#23496d] file:text-white hover:file:opacity-90 cursor-pointer" />
             </div>
           </div>
         </div>
 
-        <div class="md:col-span-2">
-          <button type="submit" id="btn-salvar" class="bg-[#009ee3] hover:bg-[#0082ba] text-white px-8 py-3 rounded-xl font-medium transition shadow-sm">
+        <div class="md:col-span-2 pt-2">
+          <button type="submit" id="btn-salvar" 
+                  style="background-color: #23496d !important; color: #ffffff !important;"
+                  class="w-full sm:w-auto px-8 py-3.5 rounded-xl text-xs uppercase tracking-wider font-semibold shadow-md hover:opacity-90 transition active:scale-95 cursor-pointer">
             Adicionar Presente à Lista
           </button>
         </div>
       </form>
     </div>
 
-    <!-- Tabela de Presentes Cadastrados -->
-    <div class="bg-white p-8 rounded-3xl shadow-sm border border-sky-100">
-      <h3 class="font-serif text-xl text-slate-800 font-semibold mb-4">Gerenciar Presentes</h3>
-      <div class="overflow-x-auto">
+    <!-- Lista / Tabela de Presentes -->
+    <div class="bg-white p-5 sm:p-8 rounded-3xl shadow-sm border border-[#cbe4fa]">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="font-serif text-xl text-[#1c3852] font-medium">Gerenciar Presentes</h3>
+        <span id="contador-presentes" class="text-xs font-medium text-slate-400"></span>
+      </div>
+
+      <!-- VISÃO DESKTOP (TABELA) -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-left text-sm text-slate-600">
-          <thead class="bg-slate-50 text-xs uppercase text-slate-400 border-b border-slate-100">
+          <thead class="bg-[#f8fbfe] text-xs uppercase text-[#4f7f9e] border-b border-[#cbe4fa]">
             <tr>
-              <th class="p-3">Item</th>
-              <th class="p-3">Valor</th>
-              <th class="p-3">Status</th>
-              <th class="p-3">Comprador</th>
-              <th class="p-3 text-right">Ações</th>
+              <th class="p-3.5">Item</th>
+              <th class="p-3.5">Valor</th>
+              <th class="p-3.5">Status</th>
+              <th class="p-3.5">Comprador</th>
+              <th class="p-3.5 text-right">Ações</th>
             </tr>
           </thead>
-          <tbody id="tabela-admin" class="divide-y divide-slate-100">
+          <tbody id="tabela-admin-desktop" class="divide-y divide-[#eef5fa]">
             <!-- Renderizado via JS -->
           </tbody>
         </table>
+      </div>
+
+      <!-- VISÃO MOBILE (CARTÕES RESPONSIVOS) -->
+      <div id="tabela-admin-mobile" class="md:hidden space-y-4">
+        <!-- Renderizado via JS -->
       </div>
     </div>
 
   </div>
 
-  <!-- MODAL DE EDIÇÃO -->
-  <div id="modal-editar" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-8 max-w-lg w-full shadow-xl border border-sky-100 space-y-5">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-        <h3 class="font-serif text-xl text-slate-800 font-semibold">Editar Presente</h3>
-        <button onclick="fecharModalEditar()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+  <!-- ================= MODAL DE EDIÇÃO RESPONSIVO ================= -->
+  <div id="modal-editar" class="hidden fixed inset-0 bg-[#0e1d2a]/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-[#cbe4fa] overflow-hidden my-auto max-h-[92vh] flex flex-col">
+      
+      <!-- Topo Modal -->
+      <div class="flex justify-between items-center bg-[#1c3852] p-5 text-white">
+        <h3 class="font-serif text-lg font-medium text-white">Editar Presente</h3>
+        <button onclick="fecharModalEditar()" class="text-white/70 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <form id="form-editar" onsubmit="atualizarPresente(event)" class="space-y-4">
+      <!-- Formulário com Scroll Interno Seguro -->
+      <form id="form-editar" onsubmit="atualizarPresente(event)" class="p-5 sm:p-6 overflow-y-auto space-y-4 text-sm">
         <input type="hidden" id="edit-id" />
 
         <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome</label>
-          <input type="text" id="edit-nome" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-400 focus:outline-none text-sm" />
+          <label class="block text-xs font-semibold text-[#1c3852] uppercase mb-1">Nome</label>
+          <input type="text" id="edit-nome" required 
+                 class="w-full p-3 border border-[#cbe4fa] bg-[#f8fbfe] rounded-xl focus:ring-2 focus:ring-[#8bbbe0] focus:outline-none transition" />
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Valor (R$)</label>
-            <input type="number" step="0.01" id="edit-valor" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-400 focus:outline-none text-sm" />
+            <label class="block text-xs font-semibold text-[#1c3852] uppercase mb-1">Valor (R$)</label>
+            <input type="number" step="0.01" id="edit-valor" required 
+                   class="w-full p-3 border border-[#cbe4fa] bg-[#f8fbfe] rounded-xl focus:ring-2 focus:ring-[#8bbbe0] focus:outline-none transition" />
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Status</label>
-            <select id="edit-status" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-400 focus:outline-none text-sm">
+            <label class="block text-xs font-semibold text-[#1c3852] uppercase mb-1">Status</label>
+            <select id="edit-status" class="w-full p-3 border border-[#cbe4fa] bg-[#f8fbfe] rounded-xl focus:ring-2 focus:ring-[#8bbbe0] focus:outline-none transition">
               <option value="DISPONIVEL">DISPONIVEL</option>
               <option value="COMPRADO">COMPRADO</option>
             </select>
@@ -135,25 +164,29 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Descrição</label>
-          <input type="text" id="edit-descricao" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-400 focus:outline-none text-sm" />
+          <label class="block text-xs font-semibold text-[#1c3852] uppercase mb-1">Descrição</label>
+          <input type="text" id="edit-descricao" 
+                 class="w-full p-3 border border-[#cbe4fa] bg-[#f8fbfe] rounded-xl focus:ring-2 focus:ring-[#8bbbe0] focus:outline-none transition" />
         </div>
 
         <!-- Trocar Imagem Opcional -->
         <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Trocar Foto (Opcional)</label>
-          <div class="flex items-center gap-4">
-            <img id="edit-img-preview" src="" class="w-14 h-14 object-cover rounded-xl border border-slate-200">
+          <label class="block text-xs font-semibold text-[#1c3852] uppercase mb-1">Trocar Foto (Opcional)</label>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3 border border-[#cbe4fa] rounded-xl bg-[#f8fbfe]">
+            <img id="edit-img-preview" src="" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shrink-0">
             <input type="file" accept="image/*" onchange="processarFoto(event, 'preview-edit')" 
-                   class="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-sky-100 file:text-sky-700 cursor-pointer" />
+                   class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-[#23496d] file:text-white cursor-pointer" />
           </div>
         </div>
 
-        <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
-          <button type="button" onclick="fecharModalEditar()" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50">
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-slate-100">
+          <button type="button" onclick="fecharModalEditar()" 
+                  class="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-200 text-slate-600 text-xs uppercase font-semibold hover:bg-slate-50 transition">
             Cancelar
           </button>
-          <button type="submit" id="btn-atualizar" class="px-5 py-2.5 rounded-xl bg-[#009ee3] hover:bg-[#0082ba] text-white text-xs font-semibold transition">
+          <button type="submit" id="btn-atualizar" 
+                  style="background-color: #23496d !important; color: #ffffff !important;"
+                  class="w-full sm:w-auto px-6 py-3 rounded-xl text-xs uppercase font-semibold shadow-md hover:opacity-90 transition">
             Salvar Alterações
           </button>
         </div>
@@ -161,13 +194,14 @@
     </div>
   </div>
 
+  <!-- ================= LÓGICA JAVASCRIPT ================= -->
   <script>
     const API_URL = "https://casamento-backend-w0y5.onrender.com/api/presentes";
     const SENHA_MESTRA = "adiellindo";
     
     let imagemBase64Novo = "";
     let imagemBase64Edit = "";
-    let presentesCache = []; // Guarda a lista para preencher a modal rápido
+    let presentesCache = [];
 
     function autenticar() {
       const input = document.getElementById("senha-admin").value;
@@ -179,6 +213,11 @@
         alert("Senha incorreta!");
       }
     }
+
+    // Permite dar Enter no campo de senha
+    document.getElementById("senha-admin").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") autenticar();
+    });
 
     function processarFoto(event, tipo) {
       const file = event.target.files[0];
@@ -213,29 +252,75 @@
     }
 
     async function carregarTabelaAdmin() {
-      const res = await fetch(`${API_URL}/todos`);
-      presentesCache = await res.json();
-      const tbody = document.getElementById("tabela-admin");
+      const tbodyDesktop = document.getElementById("tabela-admin-desktop");
+      const containerMobile = document.getElementById("tabela-admin-mobile");
+      const contador = document.getElementById("contador-presentes");
 
-      tbody.innerHTML = presentesCache.map(item => `
-        <tr class="hover:bg-slate-50">
-          <td class="p-3 font-medium text-slate-800 flex items-center gap-3">
-            <img src="${item.imagemUrl || 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=100&q=80'}" class="w-10 h-10 object-cover rounded-lg border border-slate-200">
-            ${item.nome}
-          </td>
-          <td class="p-3 font-semibold text-[#c5a059]">R$ ${Number(item.valor).toFixed(2).replace('.', ',')}</td>
-          <td class="p-3">
-            <span class="px-2.5 py-1 text-xs font-semibold rounded-full ${item.status === 'COMPRADO' ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'}">
-              ${item.status}
-            </span>
-          </td>
-          <td class="p-3 text-xs text-slate-500">${item.compradorNome || '-'}</td>
-          <td class="p-3 text-right space-x-3">
-            <button onclick="abrirModalEditar(${item.id})" class="text-xs text-sky-600 hover:text-sky-800 font-semibold">Editar</button>
-            <button onclick="excluirPresente(${item.id})" class="text-xs text-red-500 hover:text-red-700 font-medium">Excluir</button>
-          </td>
-        </tr>
-      `).join('');
+      try {
+        const res = await fetch(`${API_URL}/todos`);
+        if (!res.ok) throw new Error();
+        presentesCache = await res.json();
+
+        contador.textContent = `${presentesCache.length} presentes cadastrados`;
+
+        if (presentesCache.length === 0) {
+          const vazio = `<div class="p-8 text-center text-slate-400 text-sm">Nenhum presente cadastrado ainda.</div>`;
+          tbodyDesktop.innerHTML = `<tr><td colspan="5">${vazio}</td></tr>`;
+          containerMobile.innerHTML = vazio;
+          return;
+        }
+
+        // Renderização Desktop (Tabela)
+        tbodyDesktop.innerHTML = presentesCache.map(item => `
+          <tr class="hover:bg-[#f8fbfe] transition">
+            <td class="p-3.5 font-medium text-[#1c3852] flex items-center gap-3">
+              <img src="${item.imagemUrl || 'casal.png'}" class="w-12 h-12 object-cover rounded-xl border border-slate-200 shrink-0">
+              <span class="line-clamp-2">${item.nome}</span>
+            </td>
+            <td class="p-3.5 font-semibold text-[#23496d] whitespace-nowrap">R$ ${Number(item.valor).toFixed(2).replace('.', ',')}</td>
+            <td class="p-3.5 whitespace-nowrap">
+              <span class="px-3 py-1 text-xs font-semibold rounded-full ${item.status === 'COMPRADO' ? 'bg-emerald-100 text-emerald-800' : 'bg-[#e2effa] text-[#1c3852]'}">
+                ${item.status}
+              </span>
+            </td>
+            <td class="p-3.5 text-xs text-slate-500 font-medium">${item.compradorNome || '-'}</td>
+            <td class="p-3.5 text-right space-x-3 whitespace-nowrap">
+              <button onclick="abrirModalEditar(${item.id})" class="text-xs text-[#23496d] hover:underline font-semibold cursor-pointer">Editar</button>
+              <button onclick="excluirPresente(${item.id})" class="text-xs text-rose-600 hover:underline font-medium cursor-pointer">Excluir</button>
+            </td>
+          </tr>
+        `).join('');
+
+        // Renderização Mobile (Cards)
+        containerMobile.innerHTML = presentesCache.map(item => `
+          <div class="bg-[#f8fbfe] p-4 rounded-2xl border border-[#cbe4fa] space-y-3">
+            <div class="flex items-center gap-3">
+              <img src="${item.imagemUrl || 'casal.png'}" class="w-14 h-14 object-cover rounded-xl border border-slate-200 shrink-0">
+              <div class="flex-grow min-w-0">
+                <h4 class="font-serif text-sm font-semibold text-[#1c3852] truncate">${item.nome}</h4>
+                <p class="text-sm font-semibold text-[#23496d] mt-0.5">R$ ${Number(item.valor).toFixed(2).replace('.', ',')}</p>
+              </div>
+            </div>
+            
+            <div class="flex justify-between items-center text-xs border-t border-[#cbe4fa]/60 pt-2.5">
+              <span class="px-2.5 py-0.5 font-semibold rounded-full ${item.status === 'COMPRADO' ? 'bg-emerald-100 text-emerald-800' : 'bg-[#e2effa] text-[#1c3852]'}">
+                ${item.status}
+              </span>
+              <span class="text-slate-500 text-[11px] truncate max-w-[140px]">
+                ${item.compradorNome ? `Por: <b>${item.compradorNome}</b>` : 'Sem comprador'}
+              </span>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-1 border-t border-[#cbe4fa]/40">
+              <button onclick="abrirModalEditar(${item.id})" class="px-3 py-1.5 rounded-lg border border-[#cbe4fa] bg-white text-xs text-[#23496d] font-semibold">Editar</button>
+              <button onclick="excluirPresente(${item.id})" class="px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-xs text-rose-600 font-semibold">Excluir</button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     async function salvarPresente(e) {
@@ -275,7 +360,6 @@
       }
     }
 
-    // Modal de Edição
     function abrirModalEditar(id) {
       const item = presentesCache.find(p => p.id === id);
       if (!item) return;
@@ -287,7 +371,7 @@
       document.getElementById("edit-status").value = item.status;
       document.getElementById("edit-img-preview").src = item.imagemUrl || 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=200&q=80';
       
-      imagemBase64Edit = ""; // Limpa qualquer upload prévio
+      imagemBase64Edit = "";
       document.getElementById("modal-editar").classList.remove("hidden");
     }
 
@@ -307,7 +391,7 @@
         valor: parseFloat(document.getElementById("edit-valor").value),
         descricao: document.getElementById("edit-descricao").value,
         status: document.getElementById("edit-status").value,
-        imagemUrl: imagemBase64Edit // se vazio, o backend mantém a imagem anterior
+        imagemUrl: imagemBase64Edit
       };
 
       try {
