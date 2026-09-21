@@ -30,7 +30,7 @@ async function carregarPresentes() {
   }
 }
 
-// Renderiza os cartões dos presentes com a nova paleta Floral Azul
+// Renderiza os cartões dos presentes com a paleta Floral Azul
 function renderizarPresentes(presentes) {
   const container = document.getElementById("grid-presentes");
   container.innerHTML = "";
@@ -38,7 +38,7 @@ function renderizarPresentes(presentes) {
   if (presentes.length === 0) {
     container.innerHTML = `
       <div class="col-span-full text-center py-12 text-slate-500">
-        <p class="font-serif italic text-lg">A lista de presentes está sendo montada pelos noivos.</p>
+        <p class="font-serif italic text-lg">A lista de presentes está a ser montada pelos noivos.</p>
       </div>
     `;
     return;
@@ -74,7 +74,6 @@ function renderizarPresentes(presentes) {
           <p class="text-slate-500 text-xs mt-1 line-clamp-2 leading-relaxed font-light">${p.descricao || ""}</p>
         </div>
         <div class="mt-4 pt-3 border-t border-[#e2effa] flex flex-col items-center gap-3">
-          <!-- Valor em destaque no azul elegante -->
           <span class="font-serif text-xl font-semibold text-[#23496d]">${valorFormatado}</span>
           ${
             isDisponivel
@@ -122,7 +121,7 @@ function fecharModalPresentear() {
   presenteSelecionadoId = null;
 }
 
-// Envia o nome e redireciona ao Mercado Pago
+// Envia o nome e redireciona ao checkout do Mercado Pago
 async function confirmarPresentear(e) {
   e.preventDefault();
   
@@ -131,120 +130,36 @@ async function confirmarPresentear(e) {
   const nomeComprador = inputNome.value.trim();
 
   if (!nomeComprador) {
-    alert("Por favor, digite seu nome.");
+    alert("Por favor, digite o seu nome.");
     return;
   }
 
   btnConfirmar.disabled = true;
-  btnConfirmar.innerText = "Carregando Checkout...";
+  btnConfirmar.innerText = "A carregar Checkout...";
 
   try {
-    const response = await fetch(`${API_URL}/${presenteSelecionadoId}/comprar`, {
+    // Aponta exatamente para o endpoint /{id}/checkout do PresenteController
+    const response = await fetch(`${API_URL}/${presenteSelecionadoId}/checkout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nome: nomeComprador }),
     });
 
-    if (!response.ok) throw new Error("Erro ao gerar pagamento");
-
     const data = await response.json();
+    const linkPagamento = data.initPoint || data.init_point;
 
-    if (data.init_point) {
-      window.location.href = data.init_point;
+    if (response.ok && linkPagamento) {
+      window.location.href = linkPagamento;
     } else {
-      alert("Não foi possível gerar o link de pagamento. Tente novamente.");
+      console.error("Detalhes do erro do servidor:", data);
+      alert(data.error || "Não foi possível gerar o link de pagamento. Tente novamente.");
       btnConfirmar.disabled = false;
       btnConfirmar.innerText = "Ir para o Pix / Cartão";
     }
   } catch (error) {
     console.error("Erro ao comprar presente:", error);
-    alert("Erro de conexão ao gerar o pagamento. Tente novamente.");
+    alert("O servidor pode estar a inicializar (hibernação do Render). Aguarde alguns segundos e tente novamente.");
     btnConfirmar.disabled = false;
     btnConfirmar.innerText = "Ir para o Pix / Cartão";
   }
 }
-
-// Constante com a rota das mensagens no Render
-const MENSAGENS_API = "https://casamento-backend-w0y5.onrender.com/api/mensagens";
-
-// Carregar recados se o container existir na página
-async function carregarRecados() {
-  const container = document.getElementById("listaRecados");
-  if (!container) return;
-
-  try {
-    const res = await fetch(MENSAGENS_API);
-    if (!res.ok) throw new Error("Erro ao buscar recados");
-    const mensagens = await res.json();
-
-    if (mensagens.length === 0) {
-      container.innerHTML = `
-        <div class="col-span-full text-center py-8 text-slate-400 text-sm font-light">
-          Seja o primeiro a deixar uma mensagem de carinho para os noivos!
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = mensagens.map(m => `
-      <div class="bg-white p-5 rounded-2xl border border-[#cbe4fa] shadow-sm flex flex-col justify-between">
-        <p class="font-serif italic text-slate-700 text-sm leading-relaxed mb-4">"${m.texto}"</p>
-        <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-xs text-slate-400">
-          <span class="font-semibold text-[#1c3852] font-sans">${m.autor}</span>
-          <span>${m.dataEnvio ? new Date(m.dataEnvio).toLocaleDateString('pt-BR') : ''}</span>
-        </div>
-      </div>
-    `).join("");
-  } catch (error) {
-    console.error("Erro ao carregar recados:", error);
-    container.innerHTML = `
-      <div class="col-span-full text-center py-4 text-slate-400 text-sm font-light">
-        Ainda não foi possível carregar as mensagens.
-      </div>
-    `;
-  }
-}
-
-// Enviar novo recado
-async function enviarRecado(e) {
-  e.preventDefault();
-  const btn = document.getElementById("btnEnviarRecado");
-  const autorInput = document.getElementById("recadoAutor");
-  const textoInput = document.getElementById("recadoTexto");
-
-  const autor = autorInput.value.trim();
-  const texto = textoInput.value.trim();
-
-  if (!autor || !texto) {
-    alert("Por favor, preencha seu nome e a mensagem.");
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = "Publicando...";
-
-  try {
-    const res = await fetch(MENSAGENS_API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ autor, texto })
-    });
-
-    if (!res.ok) throw new Error("Erro ao enviar mensagem");
-
-    autorInput.value = "";
-    textoInput.value = "";
-    await carregarRecados();
-  } catch (err) {
-    console.error("Erro no envio:", err);
-    alert("Erro ao publicar a mensagem. Tente novamente!");
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Publicar Mensagem";
-  }
-}
-
-// Chamar o carregamento dos recados ao abrir
-document.addEventListener("DOMContentLoaded", () => {
-  carregarRecados();
-});
