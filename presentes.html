@@ -4,40 +4,100 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lista de Presentes | Adiel & Julia</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="text-slate-800 antialiased min-h-screen bg-[#f4f9fd]">
+<body class="bg-[#f4f8fc] text-slate-800 antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- Topo da Guia -->
-  <header class="py-12 px-4 bg-gradient-to-b from-[#d8ebfa] to-[#f4f9fd] border-b border-white text-center">
-    <a href="index.html" class="inline-block text-xs uppercase tracking-widest text-sky-700 hover:underline mb-4 font-semibold">
-      ← Voltar para a Página Inicial
-    </a>
-    <h1 class="font-script text-6xl md:text-7xl text-slate-800">Lista de Presentes Virtuais</h1>
-    <p class="font-serif text-[#c5a059] tracking-widest text-lg mt-2">Adiel & Julia • 14.11.2026</p>
-    <p class="text-slate-500 text-sm max-w-lg mx-auto mt-3 font-light leading-relaxed">
-      Escolha qualquer mimo abaixo para nos ajudar na nossa lua de mel e na montagem da casa nova. Pagamento seguro via <strong>Pix ou Cartão</strong>.
-    </p>
+  <!-- TOPO DE NAVEGAÇÃO -->
+  <header class="bg-white/90 backdrop-blur-md border-b border-[#cbe4fa] sticky top-0 z-40 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold text-[#23496d] hover:text-[#1c3852] transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Voltar ao Convite
+      </a>
+      <span class="font-serif text-lg text-[#23496d] font-semibold tracking-wide">Adiel & Julia</span>
+    </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-12">
-    <!-- Grid Dinâmico -->
-    <div id="grid-presentes" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div class="col-span-full text-center py-12">
-        <p class="text-slate-400 animate-pulse">Carregando os presentes...</p>
+  <!-- CONTEÚDO DOS PRESENTES -->
+  <main class="max-w-6xl mx-auto px-4 py-16 flex-grow w-full">
+    <div class="text-center mb-14">
+      <span class="text-xs uppercase tracking-[0.3em] text-[#4f7f9e] font-semibold">Mimos & Carinho</span>
+      <h1 class="font-serif text-3xl md:text-5xl text-[#1c3852] mt-2 font-medium">Lista de Presentes</h1>
+      <div class="w-16 h-0.5 bg-[#8bbbe0] mx-auto mt-4 mb-4"></div>
+      <p class="text-sm text-slate-600 max-w-xl mx-auto font-light leading-relaxed">
+        Sua presença é nosso maior presente! Caso queira nos agraciar com um mimo simbólico, escolha uma das opções abaixo:
+      </p>
+    </div>
+
+    <!-- Grade Dinâmica de Presentes -->
+    <div id="grid-presentes" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div class="col-span-full text-center py-12 text-slate-400 text-sm">
+        Carregando lista de presentes...
       </div>
     </div>
   </main>
 
-  <footer class="text-center py-8 border-t border-sky-100 text-slate-400 text-xs">
+  <!-- ================= MODAL ELEGANTE DE IDENTIFICAÇÃO ================= -->
+  <div id="modalPresentear" class="fixed inset-0 z-50 hidden bg-[#0e1d2a]/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-[#cbe4fa] overflow-hidden transform transition-all">
+      
+      <!-- Cabeçalho do Modal no Azul Petróleo do Convite -->
+      <div class="bg-[#1c3852] p-6 text-white text-center relative border-b border-[#2d5275]">
+        <span class="text-[10px] uppercase tracking-[0.25em] text-[#b8dcfa] font-semibold">Presente Selecionado</span>
+        <h3 id="modalNomePresente" class="font-serif text-xl font-medium mt-1 text-white">Nome do Presente</h3>
+        <p id="modalValorPresente" class="text-sm text-[#e1f0fc] font-semibold mt-1 font-sans">R$ 0,00</p>
+        
+        <button onclick="fecharModalPresentear()" class="absolute top-4 right-4 text-white/70 hover:text-white transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Formulário do Modal -->
+      <form id="formModalPresentear" onsubmit="confirmarPresentear(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-[#1c3852] font-semibold mb-1">
+            Seu Nome / Nome da Família <span class="text-rose-500">*</span>
+          </label>
+          <input type="text" id="modalInputNome" required placeholder="Ex: Tio Carlos e Família"
+                 class="w-full px-4 py-3 rounded-xl border border-[#cbe4fa] bg-[#f8fbfe] text-sm focus:outline-none focus:ring-2 focus:ring-[#8bbbe0] focus:border-[#8bbbe0] text-slate-800 transition" />
+          <p class="text-[11px] text-slate-400 mt-1">Assim os noivos saberão com carinho quem enviou este mimo.</p>
+        </div>
+
+        <div class="pt-2 flex gap-3">
+          <button type="button" onclick="fecharModalPresentear()" 
+                  class="w-1/2 py-3 px-4 rounded-xl border border-slate-200 text-slate-600 text-xs uppercase tracking-wider font-semibold hover:bg-slate-50 transition">
+            Cancelar
+          </button>
+          
+          <button type="submit" id="btnModalConfirmar" 
+                  style="background-color: #23496d !important; color: #ffffff !important;"
+                  class="w-1/2 py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold shadow-md hover:opacity-90 transition active:scale-95">
+            Ir para o Pix / Cartão
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- RODAPÉ -->
+  <footer class="py-8 text-center bg-white border-t border-[#cbe4fa] text-[#4f7f9e] text-xs tracking-widest uppercase">
     <p>Adiel & Julia • 14.11.2026</p>
   </footer>
 
   <script src="script.js"></script>
-  <script>
-    // Carrega apenas os presentes disponíveis
-    buscarPresentes();
-  </script>
 </body>
 </html>
